@@ -1,11 +1,6 @@
 # Memory Game Project
 
-## Table of Contents
-
-* [Game Description](#game description)
-* [Learning Purpose](#learning purpose)
-
-## Game Description
+## Project Description
 
 This project is a matching game where the player has to match two cards at a time until all the cards have been matched. At the start of the game, each player has 3 stars, but after 10 turns they are reduced to 2, and after 20 turns they are reduced to 1.
 
