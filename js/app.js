@@ -1,7 +1,7 @@
 const NUM_OF_CARDS = 16;
 const gameBoard = document.querySelector('.game-board');
 const restartButton = document.querySelector('.restart');
-let moves = document.querySelector('.moves');
+const moves = document.querySelector('.moves');
 const symbols = [
     'diamond',
     'paper-plane-o',
@@ -28,12 +28,23 @@ let seconds = 0;
 let minutes = 0;
 
 document.addEventListener('DOMContentLoaded', buildCards);
-document.addEventListener('DOMContentLoaded', timer);
-gameBoard.addEventListener('click', showCard);
 restartButton.addEventListener('click', restart);
 
+gameBoard.addEventListener('click', function(e) {
+    // causes the timer to start only if the item is an element within the gameboard and not the gameboard itself
+    if(e.target !== this && seconds === 0) {
+        timer();
+    }
+});
+gameBoard.addEventListener('click', function(e) {
+    resetWrongCards();
+    // only want to show the card if the item clicked is not the gamebaord itself and it's not already open
+    if (e.target !== this && !e.target.classList.contains('open')) {
+        showCard(e.target);
+    }
+});
+
 function buildCards() {
-    resetBoard();
     shuffle(symbols);
     for(let i = 0; i < NUM_OF_CARDS; i++) {
         const card = document.createElement('li');
@@ -50,12 +61,6 @@ function restart() {
     location.reload();
 }
 
-function resetBoard() {
-    gameBoard.textContent = '';
-    moves.textContent = '0';
-    matchCount = 0;
-}
-
 function resetWrongCards() {
     for(let card of cardsToReset) {
         card.classList.remove('wrong');
@@ -63,9 +68,12 @@ function resetWrongCards() {
 }
 
 function resetOpenCards() {
-    incrementMoveCounter();
-    openSymbol = '';
-    openCards = [];
+    // don't increment the move count if the same card is clicked more than once
+    if(openCards[0] !== openCards[1]) {
+        incrementMoveCounter();
+    }
+        openSymbol = '';
+        openCards = [];
 }
 
 function incrementMoveCounter() {
@@ -73,23 +81,28 @@ function incrementMoveCounter() {
     moves.textContent = moveCount;
 }
 
-function showCard(e) {
+function showCard(card) {
     resetWrongCards();
-    const card = e.target;
     card.classList.add('open');
     card.classList.add('show');
     checkForMatch(card);
 }
 
 function checkForMatch(card) {
-    const symbol = card.querySelector('i').classList[1];  // grabs the card's fa- class (which is used to differentiate the cards)
+    // grab the card's fa- class (which is used to differentiate the cards)
+    const symbol = card.querySelector('i').classList[1];
     openCards.push(card);
     if(openSymbol === '') {
         openSymbol = symbol;
-    } else if(openSymbol === symbol) {
-        showMatch();
     } else {
-        closeCards();
+        // these functions should only occur if the same card hasn't been clicked twice in a row
+        if(openCards[0] !== openCards[1]) {
+            if(openSymbol === symbol) {
+                showMatch();
+            } else {
+                closeCards();
+            }
+        }
     }
 }
 
@@ -175,6 +188,7 @@ function buildPlayAgainButton() {
 }
 
 function timer() {
+    // call the function to increment the timer once every second
     let interval = setInterval(function() {
         updateTime();
     }, 1000);

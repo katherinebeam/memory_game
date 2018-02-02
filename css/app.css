@@ -33,6 +33,11 @@ h1 {
     font-weight: 300;
 }
 
+/* prevents errors in game when icon is clicked instead of the card */
+.fa {
+    pointer-events: none;
+}
+
 /*
  * Styles for the game board
  */
